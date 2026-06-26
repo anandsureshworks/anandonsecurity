@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Freshness ≠ liveness — Anand on Security</title>
+  <meta name="description" content="Your monitor says the agent is fine. It's been dead for three weeks. Why freshness checks pass over dead engines — and what to detect instead." />
+  <meta name="robots" content="index, follow" />
+  <meta property="og:title" content="Freshness ≠ liveness" />
+  <meta property="og:description" content="Your monitor says the agent is fine. It's been dead for three weeks." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://anandonsecurity.com/freshness-is-not-liveness/" />
+  <link rel="canonical" href="https://anandonsecurity.com/freshness-is-not-liveness/" />
+  <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+  <link rel="alternate" type="application/atom+xml" title="Anand on Security" href="/feed.xml" />
+  <link rel="stylesheet" href="/style.css" />
+  <script>
+    /* no-flash theme: resolve before first paint */
+    (function(){var d=document.documentElement;try{var t=localStorage.getItem('theme');
+      d.dataset.theme=(t==='light'||t==='dark')?t:(matchMedia('(prefers-color-scheme: light)').matches?'light':'dark');
+    }catch(e){d.dataset.theme='dark';}})();
+  </script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <button id="themeToggle" class="theme-toggle" type="button" aria-label="Toggle color theme">☀</button>
+
+  <div class="wrap">
+    <a class="masthead" href="/"><img src="/as-logo.svg" alt="" /> anand<b>on</b>security</a>
+
+    <main id="main">
+    <article>
+      <header>
+        <div class="kicker">Take · reliability</div>
+        <h1>Freshness ≠ liveness</h1>
+        <p class="dek">Your monitor says the agent is fine. It&rsquo;s been dead for three weeks.</p>
+        <p class="byline">Anand Suresh · 2026-06-26</p>
+      </header>
+
+      <p>Fresh output over a dead engine is the most boring catastrophe in autonomous systems: no crash, no stack trace, no page at 3&nbsp;a.m. Just a green dashboard and a quiet, expensive lie.</p>
+
+      <p class="tone">I know because I shipped it. More than once.</p>
+
+      <p>The dashboard is green. The output file has today&rsquo;s timestamp. The scheduled job exited&nbsp;0. Every check you have says the system is alive — and it has been dead for weeks. The fix is never smarter prediction. It&rsquo;s the discipline to detect the absence of work.</p>
+
+      <blockquote><p><strong>Predict less, detect more.</strong> You can&rsquo;t forecast the shape of a silence you&rsquo;ve never seen. You can always detect the one thing that&rsquo;s true of every dead engine: it stops producing.</p></blockquote>
+
+      <h2>The one word your monitor is missing</h2>
+
+      <p class="tone">Freshness asks one question: was this written recently? Liveness asks a strictly stronger one: is the thing that writes it actually working?</p>
+
+      <p>A fresh file over a dead producer passes the first and fails the second. Every silent failure I&rsquo;ve shipped has lived in that gap.</p>
+
+      <blockquote><p>Liveness is four invariants, not one: the output <strong>exists</strong>, it&rsquo;s <strong>fresh</strong>, it&rsquo;s <strong>non-empty</strong>, and — the one everybody skips — it&rsquo;s <strong>producing</strong>.</p></blockquote>
+
+      <p>&ldquo;Producing&rdquo; means the content actually advanced: the counter moved, the baseline filled, the analysis is real and not a placeholder sitting behind a recent date. It&rsquo;s the only invariant that separates a working engine from a fresh corpse — and the only one freshness can&rsquo;t see.</p>
+
+      <h2>The mechanism is mundane</h2>
+
+      <p>You have an agent on a scheduler — launchd, cron, a Kubernetes CronJob. It wakes, does its work, writes a file, exits. <strong>Every scheduled run is a fresh process.</strong> A counter you initialize in <code>__init__</code> and hold in memory resets to its starting value on every run, because the process that held it died and a new one started from scratch. The adaptive logic meant to engage after <em>N</em> runs never engages — <em>N</em> is always&nbsp;1. The code reads correctly. Your tests pass, because they run in one long-lived interpreter that hides the bug. In production the work never advances, and nothing tells you, because the file keeps getting written with a fresh timestamp.</p>
+
+      <p>I have watched a real one: an analysis whose baseline sat permanently at <code>not_ready</code> behind a perfectly recent <code>generated_at</code>. New file every cycle; the thing inside it never moved. Freshness monitoring reported green for weeks.</p>
+
+      <h2>It caught its own author</h2>
+
+      <p>The part that should bother you: I write reliability tooling, and I fell for this <em>inside the tool that scans for it.</em> A secrets-scan of mine once reported clean — fresh output, recent run — while it had quietly stopped doing the actual scanning.</p>
+
+      <p>The bug was trivial. The real failure was a habit of mind: <strong>trusting a system&rsquo;s &ldquo;reliability&rdquo;</strong> — a green check, a recent run — <strong>instead of reasoning from first principles about what the check actually proves.</strong> A timestamp proves a write happened. It proves nothing about the work behind it. I knew that, and trusted the green anyway. That is the whole trap, and it does not care how well you understand it.</p>
+
+      <h2>What to actually do</h2>
+
+      <p>Three moves, and you can do all of them by hand, no library required:</p>
+
+      <ol class="steps">
+        <li><strong>Make cross-run state durable by construction.</strong> If it must survive a restart, it must live on disk, written atomically (temp file&nbsp;+&nbsp;rename, never in place). And test it by <em>killing the process</em> — spawn real subprocesses that increment, save, and exit, and assert the value climbs <code>0&rarr;1&rarr;2&rarr;3</code> across genuine process death. A test that reuses an object in one interpreter passes with the bug fully present.</li>
+        <li><strong>Replace freshness checks with a liveness contract.</strong> Stop asking &ldquo;recent?&rdquo; Ask &ldquo;exists, fresh, non-empty, <em>and producing?</em>&rdquo; Define <em>producing</em> as a predicate over the payload — the counter advanced, the field filled — and fail the check when it&rsquo;s false, even when the timestamp is immaculate.</li>
+        <li><strong>Fail loud — but only on transitions.</strong> A detector with no response channel is a sensor wired to nothing. Route the verdict somewhere you&rsquo;ll actually see it, but fire on the <em>change</em>, not every tick, or you&rsquo;ll train yourself to mute it. And make certain the alarm can never crash the run it&rsquo;s protecting.</li>
+      </ol>
+
+      <p>I packaged these three into a small, dependency-free harness — <a href="https://agentliveness.anandsureshworks.dev/">agentliveness</a> — because I got tired of re-learning the same lesson. But the harness is incidental. The discipline is the point.</p>
+
+      <hr />
+
+      <p>A dead engine doesn&rsquo;t scream. It goes quiet behind a fresh timestamp and waits for you to notice. So stop trusting the timestamp — and build the thing that notices.</p>
+
+      <footer>
+        <a href="/">&lt;_ all essays</a>
+        <span>anandonsecurity.com</span>
+      </footer>
+    </article>
+    </main>
+  </div>
+
+  <script>
+    (function(){var d=document.documentElement,b=document.getElementById('themeToggle');
+      function paint(){var l=d.dataset.theme==='light';b.textContent=l?'☾':'☀';
+        b.setAttribute('aria-label','Switch to '+(l?'dark':'light')+' theme');}
+      paint();b.addEventListener('click',function(){var n=d.dataset.theme==='light'?'dark':'light';
+        d.dataset.theme=n;try{localStorage.setItem('theme',n);}catch(e){}paint();});})();
+  </script>
+</body>
+</html>

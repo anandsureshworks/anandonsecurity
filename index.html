@@ -3,97 +3,57 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>AnandOnSecurity — coming soon</title>
-  <meta name="description" content="Opinionated analysis on AI and LLM security. Takes, teardowns, and a rubric with a spine. Coming soon." />
+  <title>Anand on Security — opinionated analysis on AI &amp; LLM security</title>
+  <meta name="description" content="Opinionated analysis on AI and LLM security. Takes, teardowns, and a rubric with a spine — what I think, not just what's true." />
   <meta name="robots" content="index, follow" />
-
-  <meta property="og:title" content="AnandOnSecurity" />
-  <meta property="og:description" content="Opinionated analysis on AI and LLM security — coming soon." />
+  <meta property="og:title" content="Anand on Security" />
+  <meta property="og:description" content="Opinionated analysis on AI & LLM security — takes, teardowns, and a rubric with a spine." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://anandonsecurity.com/" />
-
-  <style>
-    :root {
-      --bg: oklch(0.10 0 0);
-      --panel: oklch(0.13 0 0);
-      --fg: oklch(0.92 0 0);
-      --muted: oklch(0.62 0 0);
-      --primary: oklch(0.78 0.16 150);
-      --border: oklch(0.24 0 0);
-    }
-    * { box-sizing: border-box; }
-    html, body { height: 100%; }
-    body {
-      margin: 0;
-      background: var(--bg);
-      color: var(--fg);
-      font-family: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
-      line-height: 1.6;
-      display: grid;
-      place-items: center;
-      padding: 2rem;
-    }
-    main { width: 100%; max-width: 38rem; }
-    .prompt { color: var(--primary); font-weight: 600; font-size: 0.95rem; letter-spacing: 0.02em; }
-    h1 {
-      font-size: clamp(1.8rem, 6vw, 2.8rem);
-      margin: 0.6rem 0 0.4rem;
-      font-weight: 700;
-      letter-spacing: -0.01em;
-    }
-    .tagline { color: var(--fg); font-size: 1.05rem; margin: 0 0 1.4rem; }
-    .status {
-      display: inline-flex; align-items: center; gap: 0.5rem;
-      border: 1px solid var(--border); background: var(--panel);
-      border-radius: 0.5rem; padding: 0.4rem 0.75rem;
-      font-size: 0.85rem; color: var(--muted);
-    }
-    .dot {
-      width: 0.5rem; height: 0.5rem; border-radius: 50%;
-      background: var(--primary);
-      animation: pulse 1.6s ease-in-out infinite;
-    }
-    @keyframes pulse { 0%, 100% { opacity: 0.35; } 50% { opacity: 1; } }
-    @media (prefers-reduced-motion: reduce) { .dot { animation: none; } }
-    .what {
-      margin: 1.6rem 0;
-      padding: 1rem 1.1rem;
-      border-left: 3px solid var(--primary);
-      background: oklch(0.78 0.16 150 / 0.06);
-      border-radius: 0 0.4rem 0.4rem 0;
-      color: var(--fg);
-      font-size: 0.95rem;
-    }
-    .what strong { color: var(--primary); }
-    .bridge { margin-top: 1.8rem; font-size: 0.95rem; }
-    a {
-      color: var(--primary); text-decoration: none;
-      border-bottom: 1px solid color-mix(in oklch, var(--primary) 40%, transparent);
-      transition: border-color 0.15s;
-    }
-    a:hover { border-bottom-color: var(--primary); }
-    footer { margin-top: 2.4rem; color: var(--muted); font-size: 0.8rem; }
-  </style>
+  <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+  <link rel="alternate" type="application/atom+xml" title="Anand on Security" href="/feed.xml" />
+  <link rel="stylesheet" href="/style.css" />
+  <script>
+    (function(){var d=document.documentElement;try{var t=localStorage.getItem('theme');
+      d.dataset.theme=(t==='light'||t==='dark')?t:(matchMedia('(prefers-color-scheme: light)').matches?'light':'dark');
+    }catch(e){d.dataset.theme='dark';}})();
+  </script>
 </head>
 <body>
-  <main>
-    <p class="prompt">&gt;_ anandonsecurity</p>
-    <h1>Anand on Security</h1>
-    <p class="tagline">Opinionated analysis on AI &amp; LLM security.</p>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <button id="themeToggle" class="theme-toggle" type="button" aria-label="Toggle color theme">☀</button>
 
-    <span class="status"><span class="dot" aria-hidden="true"></span> Coming soon</span>
+  <div class="wrap">
+    <a class="masthead" href="/"><img src="/as-logo.svg" alt="" /> anand<b>on</b>security</a>
 
-    <div class="what">
-      Takes, teardowns, and a rubric with a spine — <strong>what I think</strong>,
-      not just what&rsquo;s true. The neutral, cited reference already lives next door.
+    <main id="main">
+      <p class="lede"><b>Opinionated analysis on AI &amp; LLM security.</b> Takes, teardowns, and a
+        rubric with a spine — <b>what I think</b>, not just what&rsquo;s true. The neutral, cited
+        reference lives next door at <a href="https://anandsureshworks.dev/">anandsureshworks.dev</a>.</p>
+
+      <section aria-label="essays">
+        <div class="entry">
+          <div class="date">2026-06-26 · reliability</div>
+          <h2><a href="/freshness-is-not-liveness/">Freshness ≠ liveness</a></h2>
+          <p class="dek">Your monitor says the agent is fine. It&rsquo;s been dead for three weeks.</p>
+        </div>
+      </section>
+
+      <p class="subscribe">Subscribe: <a href="/feed.xml">Atom / RSS feed</a></p>
+    </main>
+
+    <div class="home-footer">
+      <span>© Anand Suresh · anandonsecurity.com</span>
+      <a href="https://anandsureshworks.dev/">the reference →</a>
     </div>
+  </div>
 
-    <p class="bridge">
-      In the meantime, read the reference →
-      <a href="https://anandsureshworks.dev/">anandsureshworks.dev</a>
-    </p>
-
-    <footer>© Anand Suresh · anandonsecurity.com</footer>
-  </main>
+  <script>
+    (function(){var d=document.documentElement,b=document.getElementById('themeToggle');
+      function paint(){var l=d.dataset.theme==='light';b.textContent=l?'☾':'☀';
+        b.setAttribute('aria-label','Switch to '+(l?'dark':'light')+' theme');}
+      paint();b.addEventListener('click',function(){var n=d.dataset.theme==='light'?'dark':'light';
+        d.dataset.theme=n;try{localStorage.setItem('theme',n);}catch(e){}paint();});})();
+  </script>
 </body>
 </html>
