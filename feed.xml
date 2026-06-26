@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>Anand on Security</title>
+  <subtitle>Opinionated analysis on AI &amp; LLM security.</subtitle>
+  <link href="https://anandonsecurity.com/feed.xml" rel="self" />
+  <link href="https://anandonsecurity.com/" />
+  <id>https://anandonsecurity.com/</id>
+  <updated>2026-06-26T08:00:00Z</updated>
+  <author><name>Anand Suresh</name></author>
+  <entry>
+    <title>Freshness &#8800; liveness</title>
+    <link href="https://anandonsecurity.com/freshness-is-not-liveness/" />
+    <id>https://anandonsecurity.com/freshness-is-not-liveness/</id>
+    <updated>2026-06-26T08:00:00Z</updated>
+    <published>2026-06-26T08:00:00Z</published>
+    <category term="reliability" />
+    <summary>Your monitor says the agent is fine. It's been dead for three weeks. Why freshness checks pass over dead engines — and what to detect instead.</summary>
+  </entry>
+</feed>
